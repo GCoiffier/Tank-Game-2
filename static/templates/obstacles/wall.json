@@ -1,0 +1,14 @@
+{
+    "name" : "wall",
+    "type" : "obstacle",
+    "sprite" : {
+        "name" : "wall.png",
+        "origin" : [16,16],
+        "z" : 10
+    },
+    "transform" : {},
+    "collision" : {
+        "bbox" : [-16, -16, 32, 32],
+        "causesEvents" : false
+    }
+}

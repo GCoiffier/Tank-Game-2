@@ -1,0 +1,14 @@
+{
+    "name" : "turret1",
+    "type" : "turret",
+    "sprite" : {
+        "name" : "tank/canon1.png",
+        "origin" : [13,16],
+        "z" : 7
+    },
+    "transform" : {},
+    "orientation" : {
+        "speed" : 30,
+        "angle" : 90   
+    }
+}

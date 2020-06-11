@@ -1,0 +1,22 @@
+{
+    "name" : "egg",
+    "type" : "bullet",
+    "sprite" : {
+        "name" : "egg.png",
+        "origin" : [6,6],
+        "z" : 6
+    },
+    "transform" : true,
+    "debug" : true,
+    "velocity" : {
+        "speed" : 101
+    },
+    "orientation" : {
+        "speed" : 0,
+        "angle" : 90
+    },
+    "collision" : {
+        "causesEvents" : true,
+        "bbox" : [-6, -6, 6, 6]
+    }
+}

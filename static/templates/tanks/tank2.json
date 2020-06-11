@@ -1,0 +1,29 @@
+{
+    "name" : "tank1",
+    "type" : "tank",
+    "sprite" : {
+        "name" : "tank/tank_body2.png",
+        "origin" : [16,16],
+        "z" : 5
+    },
+    "transform" : {},
+    "velocity" : {
+        "speed" : 100
+    },
+    "collision" : {
+        "bbox" : [-15, -15, 30, 30],
+        "causesEvents" : true
+    },
+    "shoot" : {
+        "bullet_type" : "classic"
+    },
+    "damage" : {
+        "hp" : 1
+    },
+    "debug" :{},
+    "children" : {
+        "turret" : {
+            "template" : "turrets/turret2.json"
+        }
+    }
+}

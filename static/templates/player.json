@@ -1,0 +1,37 @@
+{
+    "name" : "player",
+    "type" : "tank",
+    "sprite" : {
+        "name" : "tank/tank_body1_anim.png",
+        "origin" : [16,16],
+        "z" : 5
+    },
+    "animation" : {
+        "frameSize" : [32,32],
+        "fps" : 10,
+        "nframes" : 3
+    },
+    "transform" : {},
+    "velocity" : {
+        "speed" : 100
+    },
+    "orientation" : {
+        "speed" : 100,
+        "angle" : 0
+    },
+    "collision" : {
+        "bbox" : [-15, -15, 30, 30],
+        "causesEvents" : true   
+    },
+    "shoot" : {
+        "bullet_type" : "classic"
+    },
+    "damage" : {
+        "hp" : 1
+    },
+    "debug" : {},
+    "control" : {},
+    "children" : [
+        {"template" : "turrets/turret1.json"}
+    ]
+}

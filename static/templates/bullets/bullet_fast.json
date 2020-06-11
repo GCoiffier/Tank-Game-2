@@ -1,0 +1,22 @@
+{
+    "name" : "bullet_fast",
+    "type" : "bullet",
+    "sprite" : {
+        "name" : "bullet2.png",
+        "origin" : [4,4],
+        "z" : 6
+    },
+    "transform" : true,
+    "debug" : true,
+    "velocity" : {
+        "speed" : 500
+    },
+    "orientation" : {
+        "speed" : 0,
+        "angle" : 90
+    },
+    "collision" : {
+        "causesEvents" : true,
+        "bbox" : [-4, -4, 4, 4]
+    }
+}
