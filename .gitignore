@@ -35,3 +35,9 @@ CMakeFiles/*
 CMakeFiles
 makefile
 build/*
+
+# vscode files
+.vscode/*
+
+# Pycache files
+level_editor/__pycache__
