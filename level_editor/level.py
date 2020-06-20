@@ -22,20 +22,27 @@ class Level:
                 self.tileMap[i,j] = entity
 
     def to_file(self, fileName):
+        path = os.path.join("../static/levels", fileName)
         entities = dict()
         for i in range(Level.WIDTH):
             for j in range(Level.HEIGHT):
-                if self.tileMap[i,j] in entities:
-                    entities[self.tileMap[i,j]]["position"].append([i,j])
-                else:
-                    entities[self.tileMap] = {"position" : [[i,j]]}
+                if self.tileMap[i][j] is not None:
+                    if self.tileMap[i][j] in entities:
+                        entities[self.tileMap[i][j]]["position"].append([i,j])
+                    else:
+                        entities[self.tileMap[i][j]] = {"position" : [[i,j]]}
         with open(fileName,'w') as output:
             json.dump(entities, output)
 
     def clear(self):
         for i in range(Level.WIDTH):
-            for j in range(level.HEIGHT):
-                tileMap[i,j] = " "
+            for j in range(Level.HEIGHT):
+                self.tileMap[i][j] = None
 
-    def add_entity(self, i, j, ent):
-        self.tileMap[i,j] = ent
+    def __getitem__(self, ind):
+        i,j = ind
+        return self.tileMap[i][j]
+
+    def __setitem__(self, ind, item):
+        i,j = ind
+        self.tileMap[i][j] = item
