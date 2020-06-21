@@ -24,7 +24,11 @@ int main(int argc, char* argv[]) {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32), "Tank Game 2");
 
     Level level(window);
-    level.load_from_file("level_test");
+    if (argc>0){
+        level.load_from_file("level_test");
+    } else {
+        level.load_from_file(argv[1]);
+    }
 
     const float MAX_FRAME_TIME = 1 / 4.f;
     const float DELTA_TIME = 1 / 60.f;

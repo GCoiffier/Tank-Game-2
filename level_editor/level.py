@@ -1,4 +1,5 @@
 import json
+import os
 
 class Level:
 
@@ -31,6 +32,10 @@ class Level:
                         entities[self.tileMap[i][j]]["position"].append([i,j])
                     else:
                         entities[self.tileMap[i][j]] = {"position" : [[i,j]]}
+                    
+                    if "obstacles" in self.tileMap[i][j]:
+                        entities[self.tileMap[i][j]]["connect_adjacent"] = True
+
         with open(fileName,'w') as output:
             json.dump(entities, output)
 

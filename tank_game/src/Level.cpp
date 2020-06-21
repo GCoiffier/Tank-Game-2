@@ -27,6 +27,7 @@
 ///
 
 #include "Level.hpp"
+#include "common/macros.hpp"
 #include "RessourceManager.hpp"
 #include "InputManager.hpp"
 #include "entity_init.hpp"
@@ -81,11 +82,12 @@ Level::Level(sf::RenderTarget& renderTarget)
     };
 
     sf::Vector2u levelSize = renderTarget.getSize();
-    for(unsigned int i = 0; i<LEVEL_WIDTH; i++){
+    FOR(i, LEVEL_WIDTH) {
         initBorder(32*i, -32, 32, 32);
         initBorder(32*i, 32*LEVEL_HEIGHT, 32, 32);
     }
-    for (unsigned int j=0 ; j<LEVEL_HEIGHT; j++){
+
+    FOR(j, LEVEL_HEIGHT) {
         initBorder(-32, 32*j, 32, 32);
         initBorder(32*LEVEL_WIDTH, 32*j, 32, 32);
     } 

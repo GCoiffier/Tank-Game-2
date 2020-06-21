@@ -2,7 +2,7 @@
 
 #include <string>
 #include <iostream>
-
+#include <vector>
 
 std::string plop_file(const char* _file, int _line);
 
@@ -26,6 +26,14 @@ inline std::string plop_unquote(const char* str) {
       result = result.substr(1, result.length()-2);
    }
    return result;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
+
+    for (const T& x : v)
+        os << x << " ";
+    return os;
 }
 
 #define plop(x) std::cerr << " DEBUG " << plop_file(__FILE__, __LINE__) << " : " << plop_unquote(#x) << plop_val(x) << std::endl

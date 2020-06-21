@@ -22,24 +22,30 @@ void ShootSystem::update(double){
         auto& shoot = entity.getComponent<ShootComponent>();
         while (!shoot.queue.empty()){
             ShootParameters& p = shoot.queue.front();
-            anax::Entity::Id id_bullet;
+            anax::Entity bullet;
+            
+            do {
+                bullet = world.createEntity();
+            }
+            while (! bullet.isValid());
+
             switch (shoot.type) {
             case BulletType::CLASSIC :
-                id_bullet = load_entity_from_file(world, "bullets/bullet_classic.json");
+                load_entity_from_file(bullet, "bullets/bullet_classic.json");
                 break;
             case BulletType::FAST :
-                id_bullet = load_entity_from_file(world, "bullets/bullet_fast.json");
+                load_entity_from_file(bullet, "bullets/bullet_fast.json");
                 break;
             case BulletType::EGG :
-                id_bullet = load_entity_from_file(world, "bullets/egg.json");
+                load_entity_from_file(bullet, "bullets/egg.json");
                 break;                
             default:
                 break;
             }
 
             // Set position and orientation of bullet
-            auto e = world.getEntity(id_bullet.index);
-            setup_bullet(e, p.position, p.angle);
+            setup_bullet(bullet, p.position, p.angle);
+            bullet.activate();
             shoot.queue.pop();
         }
     }

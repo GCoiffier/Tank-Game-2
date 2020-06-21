@@ -2,9 +2,10 @@
     "name" : "wall",
     "type" : "obstacle",
     "sprite" : {
-        "name" : "wall.png",
+        "name" : "wall",
         "origin" : [16,16],
-        "z" : 10
+        "z" : 10,
+        "connect_adjacent" : true
     },
     "transform" : {},
     "collision" : {

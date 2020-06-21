@@ -3,9 +3,12 @@
 
 #include "RessourceManager.hpp"
 #include "InputManager.hpp"
+#include "tiles.hpp"
 
 #include "common/debug.hpp"
 #include "common/math.hpp"
+#include "common/grid.hpp"
+#include "common/macros.hpp"
 
 #include <SFML/System/Vector2.hpp>
 #include <fstream>
@@ -16,13 +19,7 @@ using json = nlohmann::json;
 
 static const std::string TEMPLATE_PATH = "../static/templates/";
 
-anax::Entity::Id load_entity_from_json(anax::World& world, json& j) {
-    anax::Entity e;
-    do {
-        e = world.createEntity();
-    }   while (!e.isValid());
-
-    plop(j["name"].get<std::string>());
+void load_entity_from_json(anax::Entity& e, json& j, bool connect_adjacent) {
 
     // TypeComponent
     if (j.contains("type")) {
@@ -32,7 +29,15 @@ anax::Entity::Id load_entity_from_json(anax::World& world, json& j) {
     }
 
     // SpriteComponent
-    if (j.contains("sprite")) e.addComponent<SpriteComponent>(j["sprite"]);
+    if (j.contains("sprite")) {
+        if (connect_adjacent){
+            // Register initialization for later
+            e.addComponent<SpriteInitComponent>(j["sprite"]);
+        } else {
+            // Init SpriteComponent normally
+            e.addComponent<SpriteComponent>(j["sprite"]);
+        }
+    }
 
     // AnimationComponent
     if (j.contains("animation")) e.addComponent<AnimationComponent>(j["animation"]);
@@ -65,54 +70,82 @@ anax::Entity::Id load_entity_from_json(anax::World& world, json& j) {
     if (j.contains("children")) {
         auto& children = e.addComponent<ChildrenComponent>();
         for (auto& jchild : j["children"]) {
-            anax::Entity::Id child_id;
+            anax::Entity child = e.getWorld().createEntity();
             if (jchild.contains("template")) {
                 std::string path = jchild["template"].get<std::string>();
-                child_id = load_entity_from_file(world, path);
+                load_entity_from_file(child, path);
             } else {
-                child_id = load_entity_from_json(world, jchild);
+                load_entity_from_json(child, jchild);
             }
-            children.add_child(child_id);
+            children.add_child(child.getId());
+            child.activate();
         }
     }
-
-    e.activate();
-    return e.getId();
 }
 
 
-anax::Entity::Id load_entity_from_file(anax::World& world, const std::string& fileName){
+void load_entity_from_file(anax::Entity& e, const std::string& fileName, bool connect_adjacent){
     try {
         json data;
         std::ifstream strm(TEMPLATE_PATH+fileName);
         strm >> data;
         strm.close();
-        return load_entity_from_json(world, data);
-    } catch (std::exception& e) {
+        load_entity_from_json(e, data, connect_adjacent);
+    } catch (std::exception& excp) {
         std::cerr << "ERROR when loading file '" << fileName << "'" << std::endl;
-        std::cerr << e.what() << std::endl;
-        throw e;
+        std::cerr << excp.what() << std::endl;
+        throw excp;
     }
 }
 
 void load_level_from_json(anax::World& world, json& root){
 
-    for(auto& [path, json] : root.items()){
+    Grid<anax::Entity> tileMap(40, 25);
+    for(auto& [path, json] : root.items()) {
+
+        // Initialize one type of entities at each specified positions
+        tileMap.clear();
+
+        const bool connect_adjacent = json.contains("connect_adjacent") && json["connect_adjacent"].get<bool>();
+
         for (auto& jsonPos : json["position"]){
-            std::vector<float> _pos = jsonPos.get<std::vector<float>>();
-            sf::Vector2f pos(32 * _pos[0] + 16, 32 * _pos[1] + 16);
-            anax::Entity::Id id = load_entity_from_file(world, path);
-            anax::Entity created = world.getEntity(id.index);
-            auto& transform = created.getComponent<TransformComponent>().transform;
-            transform.setPosition(pos);
-            if (created.hasComponent<ChildrenComponent>()) { // Also translate children entities
-                for (auto& id_child : created.getComponent<ChildrenComponent>()) {
+            std::vector<int> pos = jsonPos.get<std::vector<int>>();
+            sf::Vector2f pixel_pos(32 * pos[0] + 16, 32 * pos[1] + 16);
+
+            anax::Entity e = world.createEntity();
+            load_entity_from_file(e, path, connect_adjacent);
+            tileMap(pos[0], pos[1]) = e;
+
+            auto& transform = e.getComponent<TransformComponent>().transform;
+            transform.setPosition(pixel_pos);
+            if (e.hasComponent<ChildrenComponent>()) { // Also translate children entities
+                for (auto& id_child : e.getComponent<ChildrenComponent>()) {
                     const anax::Entity& child = world.getEntity(id_child.index);
                     if (child.hasComponent<TransformComponent>()){
                         auto& childTransform = child.getComponent<TransformComponent>().transform;
-                        childTransform.setPosition(pos);
+                        childTransform.setPosition(pixel_pos);
                     }
                 }
+            }
+        }
+        
+        if (connect_adjacent){
+            FOR2(i, j, tileMap.nb_lines(), tileMap.nb_cols()) {
+                if (tileMap(i,j).isValid()){
+                    int adjacent_code = encode_neighbours(tileMap, i, j);
+                    anax::Entity e = tileMap(i,j);
+                    auto& spriteInit = e.getComponent<SpriteInitComponent>();
+                    spriteInit.spriteName = get_type(spriteInit.spriteName, adjacent_code);
+                    plop(spriteInit.spriteName);
+                    e.addComponent<SpriteComponent>(spriteInit);
+                    e.removeComponent<SpriteInitComponent>();
+                }
+            }
+        }
+
+        FOR2(i, j,tileMap.nb_lines(), tileMap.nb_cols()){
+            if (tileMap(i,j).isValid()) {
+                tileMap(i,j).activate();
             }
         }
     }
